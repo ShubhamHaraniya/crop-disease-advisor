@@ -13,8 +13,6 @@ from collections import defaultdict, Counter
 
 import numpy as np
 from PIL import Image
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 
 import torch
 from torchvision import transforms, datasets
@@ -62,6 +60,7 @@ def collect_image_paths(raw_dir: str):
 
 def stratified_split(samples, train=0.8, val=0.1, test=0.1, seed=42):
     """Stratified train/val/test split."""
+    from sklearn.model_selection import train_test_split
     assert abs(train + val + test - 1.0) < 1e-6, "Splits must sum to 1."
     paths  = [s[0] for s in samples]
     labels = [s[1] for s in samples]
@@ -128,6 +127,7 @@ def save_sample_augmentations(samples, classes, output_dir: str, n: int = 5, see
     out    = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
+    import matplotlib.pyplot as plt
     for i, (img_path, cls_name) in enumerate(chosen):
         original = Image.open(img_path).convert("RGB")
         aug_t    = TRAIN_TRANSFORM(original)   # tensor

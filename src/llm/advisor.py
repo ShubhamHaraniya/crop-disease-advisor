@@ -20,32 +20,7 @@ SYSTEM_PROMPT = (
     "Always respond with a valid JSON object following the specified schema."
 )
 
-# Maps the exact PlantVillage class-folder names (as output by EfficientNet-B4)
-# to the shorter canonical names the QLoRA LLM was fine-tuned on.
-DISEASE_ALIAS_MAP: dict[str, str] = {
-    # Corn / Maize
-    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": "Corn___Cercospora_leaf_spot",
-    "Corn_(maize)___Common_rust_":                        "Corn___Common_rust",
-    "Corn_(maize)___Northern_Leaf_Blight":                "Corn___Northern_Leaf_Blight",
-    "Corn_(maize)___healthy":                             "Corn___healthy",
-    # Pepper
-    "Pepper,_bell___Bacterial_spot":                      "Pepper___Bacterial_spot",
-    "Pepper,_bell___healthy":                             "Pepper___healthy",
-    # Tomato
-    "Tomato___Spider_mites Two-spotted_spider_mite":      "Tomato___Spider_mites",
-    # Grape
-    "Grape___Esca_(Black_Measles)":                       "Grape___Esca",
-    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)":         "Grape___Leaf_blight",
-    # Orange
-    "Orange___Haunglongbing_(Citrus_greening)":           "Orange___Haunglongbing",
-    # Cherry
-    "Cherry_(including_sour)___Powdery_mildew":           "Cherry___Powdery_mildew",
-    "Cherry_(including_sour)___healthy":                  "Cherry___healthy",
-}
-
-def normalise_disease(raw_label: str) -> str:
-    """Convert a full PlantVillage folder name to the LLM-training canonical name."""
-    return DISEASE_ALIAS_MAP.get(raw_label, raw_label)
+from src.llm.generate_dataset import normalise_disease, DISEASE_ALIAS_MAP
 
 
 REQUIRED_KEYS = {

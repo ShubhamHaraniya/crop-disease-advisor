@@ -295,8 +295,9 @@ async def predict(
     else:
         # Phase 1 / CPU mode — use curated DISEASE_DB directly (instant, no LLM)
         try:
-            from src.llm.advisor import CropDiseaseAdvisor, normalise_disease, DISEASE_ALIAS_MAP
-            from src.llm.generate_dataset import DISEASE_DB, REGIONAL_NOTES, SEASONAL_NOTES, URGENCY_MAP
+            from src.llm.generate_dataset import (
+                DISEASE_DB, REGIONAL_NOTES, SEASONAL_NOTES, URGENCY_MAP, normalise_disease
+            )
 
             disease_norm = normalise_disease(disease)
             db = DISEASE_DB.get(disease_norm, {})

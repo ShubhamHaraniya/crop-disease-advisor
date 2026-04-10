@@ -9,6 +9,35 @@ from pathlib import Path
 from collections import Counter
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Disease Normalization (Moved from advisor.py to prevent heavy LLM imports)
+# ─────────────────────────────────────────────────────────────────────────────
+DISEASE_ALIAS_MAP = {
+    # Corn / Maize
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": "Corn___Cercospora_leaf_spot",
+    "Corn_(maize)___Common_rust_":                        "Corn___Common_rust",
+    "Corn_(maize)___Northern_Leaf_Blight":                "Corn___Northern_Leaf_Blight",
+    "Corn_(maize)___healthy":                             "Corn___healthy",
+    # Pepper
+    "Pepper,_bell___Bacterial_spot":                      "Pepper___Bacterial_spot",
+    "Pepper,_bell___healthy":                             "Pepper___healthy",
+    # Tomato
+    "Tomato___Spider_mites Two-spotted_spider_mite":      "Tomato___Spider_mites",
+    # Grape
+    "Grape___Esca_(Black_Measles)":                       "Grape___Esca",
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)":         "Grape___Leaf_blight",
+    # Orange
+    "Orange___Haunglongbing_(Citrus_greening)":           "Orange___Haunglongbing",
+    # Cherry
+    "Cherry_(including_sour)___Powdery_mildew":           "Cherry___Powdery_mildew",
+    "Cherry_(including_sour)___healthy":                  "Cherry___healthy",
+}
+
+def normalise_disease(raw_label: str) -> str:
+    """Convert a full PlantVillage folder name to the LLM-training canonical name."""
+    return DISEASE_ALIAS_MAP.get(raw_label, raw_label)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Complete Disease Knowledge Base  (all 38 PlantVillage classes)
 # ─────────────────────────────────────────────────────────────────────────────
 DISEASE_DB = {

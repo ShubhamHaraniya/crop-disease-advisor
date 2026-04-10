@@ -1,0 +1,37 @@
+# ─── Vision Model ─────────────────────────────────────────────────────────────
+model: efficientnet_b4
+num_classes: 38
+image_size: 224
+batch_size: 32
+epochs: 50
+learning_rate: 1.0e-3
+weight_decay: 1.0e-4
+label_smoothing: 0.1
+dropout: 0.3
+seed: 42
+
+# Data splits
+train_split: 0.8
+val_split: 0.1
+test_split: 0.1
+
+# Unfreezing
+lr_phase1: 1.0e-3
+lr_phase2: 5.0e-4
+lr_phase3: 1.0e-4
+unfreeze_phase1_end: 15
+unfreeze_phase2_end: 30
+
+# Scheduler
+T_0: 10
+early_stop_patience: 10
+
+# ─── LLM ──────────────────────────────────────────────────────────────────────
+llm_n_pairs: 12000
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+llm_epochs: 3
+llm_lr: 2.0e-4
+llm_batch_size: 4
+llm_grad_accum: 4

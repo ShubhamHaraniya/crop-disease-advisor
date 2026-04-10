@@ -1,0 +1,103 @@
+stages:
+
+  preprocess:
+    cmd: python src/vision/preprocess.py
+      --raw_dir data/raw/plantvillage
+      --output_dir data/processed
+      --aug_dir notebooks/sample_augmentations
+    deps:
+      - src/vision/preprocess.py
+      - data/raw/plantvillage
+    params:
+      - params.yaml:
+          - seed
+          - train_split
+          - val_split
+          - test_split
+    outs:
+      - data/processed/train
+      - data/processed/val
+      - data/processed/test
+      - data/processed/class_names.json
+    metrics:
+      - data/processed/dataset_stats.json:
+          cache: false
+
+  train_vision:
+    cmd: python src/vision/train.py --config configs/vision_config.yaml
+    deps:
+      - src/vision/train.py
+      - src/vision/model.py
+      - src/vision/gradcam.py
+      - src/vision/preprocess.py
+      - configs/vision_config.yaml
+      - data/processed/train
+      - data/processed/val
+    params:
+      - params.yaml:
+          - model
+          - num_classes
+          - image_size
+          - batch_size
+          - epochs
+          - learning_rate
+          - weight_decay
+          - label_smoothing
+          - dropout
+          - seed
+    outs:
+      - models/vision/efficientnet_b4_best.pt
+    metrics:
+      - models/vision/train_metrics.json:
+          cache: false
+
+  evaluate_vision:
+    cmd: python src/vision/evaluate.py
+      --checkpoint models/vision/efficientnet_b4_best.pt
+      --data_dir data/processed/test
+      --output models/vision/eval_results.json
+    deps:
+      - src/vision/evaluate.py
+      - src/vision/model.py
+      - src/vision/gradcam.py
+      - models/vision/efficientnet_b4_best.pt
+      - data/processed/test
+      - data/processed/class_names.json
+    outs:
+      - models/vision/eval_results.json
+      - models/vision/confusion_matrix.png
+    metrics:
+      - models/vision/eval_results.json:
+          cache: false
+
+  generate_llm_dataset:
+    cmd: python src/llm/generate_dataset.py
+      --n 12000
+      --output data/processed/llm_instructions.jsonl
+      --seed 42
+    deps:
+      - src/llm/generate_dataset.py
+    params:
+      - params.yaml:
+          - llm_n_pairs
+          - seed
+    outs:
+      - data/processed/llm_instructions.jsonl
+
+  train_llm:
+    cmd: python src/llm/train_qlora.py --config configs/llm_config.yaml
+    deps:
+      - src/llm/train_qlora.py
+      - src/llm/advisor.py
+      - configs/llm_config.yaml
+      - data/processed/llm_instructions.jsonl
+      - models/vision/efficientnet_b4_best.pt   # Phase 1 prerequisite
+    params:
+      - params.yaml:
+          - lora_r
+          - lora_alpha
+          - llm_epochs
+          - llm_lr
+          - llm_batch_size
+    outs:
+      - models/llm/llama3_qlora_adapter

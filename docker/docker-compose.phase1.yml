@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  crop-advisor-phase1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.phase1
+    image: crop-disease-advisor:phase1
+    container_name: crop_advisor_phase1
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ../models/vision:/app/models/vision   # hot-swap model without rebuild
+    environment:
+      - MODEL_PATH=models/vision/efficientnet_b4_best.pt
+      - DEVICE=cuda
+      - LOG_LEVEL=info
+      - PHASE=1
+    ports:
+      - "8000:8000"   # FastAPI
+      - "7860:7860"   # Gradio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s

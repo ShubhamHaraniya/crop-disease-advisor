@@ -487,9 +487,22 @@ function renderResults(r) {
   renderReport(r);
 }
 
+function formatTop5Label(rawLabel) {
+  const parts = rawLabel.split('___');
+  if (parts.length > 1) {
+    let cropPart = parts[0].replace(/_/g, ' ').trim();
+    // Convert crop to title case
+    cropPart = cropPart.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
+    let diseasePart = cleanLabel(rawLabel); // cleanLabel already returns perfectly capitalized disease
+    return `${cropPart} — ${diseasePart}`;
+  }
+  return rawLabel.replace(/_/g, ' ');
+}
+
 function renderTop5(top5) {
   els.top5Bars.innerHTML = top5.map((p, i) => {
-    const label = cleanLabel(p.label);
+    const label = formatTop5Label(p.label);
     const conf = p.confidence;
     const isTop = i === 0;
     return `

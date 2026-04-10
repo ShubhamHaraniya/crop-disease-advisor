@@ -68,29 +68,9 @@ async def lifespan(app: FastAPI):
     else:
         CLASS_NAMES = [f"class_{i}" for i in range(38)]
 
-    # Vision model — download from HF Hub if missing
+    # Vision model — load from disk (committed via git-lfs)
     if not MODEL_PATH.exists():
-        hf_username = os.getenv("HF_USERNAME", "")
-        hf_token    = os.getenv("HF_TOKEN", None)
-        if hf_username:
-            print(f"📥 Downloading model: {hf_username}/crop-disease-efficientnet-b4")
-            print(f"   → Target: {MODEL_PATH}")
-            try:
-                from huggingface_hub import hf_hub_download
-                MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-                downloaded = hf_hub_download(
-                    repo_id=f"{hf_username}/crop-disease-efficientnet-b4",
-                    repo_type="model",
-                    filename="efficientnet_b4_best.pt",
-                    token=hf_token,
-                    local_dir=str(MODEL_PATH.parent),
-                )
-                print(f"  ✓  Model downloaded → {downloaded}")
-            except Exception as e:
-                print(f"  ⚠  Could not download model: {e}")
-                print("     Using random weights (predictions will be incorrect).")
-        else:
-            print("  ⚠  MODEL_PATH not found and HF_USERNAME not set. Using random weights.")
+        print(f"  ⚠  Model not found at {MODEL_PATH}. Using random weights.")
 
 
     VISION_MODEL = EfficientNetB4Classifier(num_classes=len(CLASS_NAMES)).to(DEVICE)

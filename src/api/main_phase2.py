@@ -73,7 +73,7 @@ async def lifespan(app: FastAPI):
         print(f"  ⚠  Model not found at {MODEL_PATH}. Using random weights.")
 
 
-    VISION_MODEL = EfficientNetB4Classifier(num_classes=len(CLASS_NAMES)).to(DEVICE)
+    VISION_MODEL = EfficientNetB4Classifier(num_classes=len(CLASS_NAMES), pretrained=False).to(DEVICE)
     if MODEL_PATH.exists():
         ckpt = torch.load(MODEL_PATH, map_location=DEVICE)
         VISION_MODEL.load_state_dict(ckpt["state_dict"])

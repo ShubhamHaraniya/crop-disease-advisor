@@ -15,12 +15,12 @@ class EfficientNetB4Classifier(nn.Module):
     and intermediate feature extraction.
     """
 
-    def __init__(self, num_classes: int = 38, dropout: float = 0.3):
+    def __init__(self, num_classes: int = 38, dropout: float = 0.3, pretrained: bool = True):
         super().__init__()
         # Load pretrained backbone (timm)
         self.backbone = timm.create_model(
             "efficientnet_b4",
-            pretrained=True,
+            pretrained=pretrained,
             num_classes=0,          # Remove default head
             global_pool="avg",
         )

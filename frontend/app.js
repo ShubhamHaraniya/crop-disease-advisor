@@ -409,10 +409,29 @@ async function runAnalysis() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function cleanLabel(label) {
-  return label.replace(/___/g, ' — ').replace(/_/g, ' ');
+  // Convert "Tomato___Spider_mites Two-spotted_spider_mite" -> "Tomato — Spider mites" etc.
+  let cleaned = label.replace(/___/g, ' — ').replace(/_/g, ' ');
+
+  // Attempt to split by the dash
+  let parts = cleaned.split('—');
+  if (parts.length > 1) {
+    let diseasePart = parts[1].trim();
+
+    // Remove anything in parentheses or trailing extra names (like " Two-spotted...") if it's too messy
+    // But for now, just proper casing: e.g. "Cedar apple rust" -> "Cedar Apple Rust"
+    diseasePart = diseasePart.split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+      
+    // Return just the disease part! The frontend already knows the crop.
+    return diseasePart;
+  }
+  
+  return cleaned;
 }
 
 function renderResults(r) {
+  // Now disease will just be "Cedar Apple Rust" instead of "Apple - Cedar apple rust"
   const disease = cleanLabel(r.disease);
   const crop = r.crop;
   const confidence = r.confidence;
@@ -422,7 +441,7 @@ function renderResults(r) {
 
   // Stats row
   els.statPlant.textContent = crop;
-  els.statDisease.textContent = disease.includes('—') ? disease.split('—')[1].trim() : disease;
+  els.statDisease.textContent = disease;
   els.statConfidence.textContent = `${confidence.toFixed(1)}%`;
   els.statSeverity.textContent = severity.split('(')[0].trim();
   els.statUrgency.textContent = urgency;

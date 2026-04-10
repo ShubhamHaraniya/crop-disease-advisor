@@ -15,16 +15,16 @@ WORKDIR /app
 COPY requirements_hf.txt .
 RUN pip install --no-cache-dir -r requirements_hf.txt
 
-# ── Build Vite frontend ────────────────────────────────────────────────────────
+# ── Build Vite frontend (Dependencies) ─────────────────────────────────────────
 COPY frontend/package*.json ./frontend/
 RUN cd frontend && npm ci --silent
 
-COPY frontend/ ./frontend/
-RUN cd frontend && npm run build
-# Output: frontend/dist/
-
 # ── Copy application code ──────────────────────────────────────────────────────
 COPY . .
+
+# ── Build Vite frontend (Production Build) ─────────────────────────────────────
+RUN cd frontend && npm run build
+# Output: frontend/dist/
 
 # ── Environment: CPU-only Phase 1 (DISEASE_DB treatment plans, no LLM) ────────
 ENV PHASE=1

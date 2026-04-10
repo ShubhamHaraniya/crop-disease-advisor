@@ -409,25 +409,33 @@ async function runAnalysis() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function cleanLabel(label) {
-  // Convert "Tomato___Spider_mites Two-spotted_spider_mite" -> "Tomato — Spider mites" etc.
-  let cleaned = label.replace(/___/g, ' — ').replace(/_/g, ' ');
-
-  // Attempt to split by the dash
-  let parts = cleaned.split('—');
+  // 'label' looks like "Tomato___Spider_mites Two-spotted_spider_mite"
+  // Split by the explicit '___' delimiter used in PlantVillage datasets
+  const parts = label.split('___');
+  
   if (parts.length > 1) {
-    let diseasePart = parts[1].trim();
+    let rawDisease = parts[1];
+    
+    // Replace underscores with spaces
+    let diseasePart = rawDisease.replace(/_/g, ' ').trim();
 
-    // Remove anything in parentheses or trailing extra names (like " Two-spotted...") if it's too messy
-    // But for now, just proper casing: e.g. "Cedar apple rust" -> "Cedar Apple Rust"
+    // Convert to proper Title Case
     diseasePart = diseasePart.split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map(word => {
+        if (!word) return '';
+        // Special case for parentheses like "(Citrus_greening)"
+        if (word.startsWith('(')) {
+          return '(' + word.charAt(1).toUpperCase() + word.slice(2).toLowerCase();
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
       .join(' ');
       
-    // Return just the disease part! The frontend already knows the crop.
     return diseasePart;
   }
   
-  return cleaned;
+  // Fallback if no '___' is found
+  return label.replace(/_/g, ' ');
 }
 
 function renderResults(r) {

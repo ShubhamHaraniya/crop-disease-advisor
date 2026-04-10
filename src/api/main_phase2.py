@@ -73,28 +73,25 @@ async def lifespan(app: FastAPI):
         hf_username = os.getenv("HF_USERNAME", "")
         hf_token    = os.getenv("HF_TOKEN", None)
         if hf_username:
-            print("📥 Model not found locally — downloading from HuggingFace Hub...")
+            print(f"📥 Downloading model: {hf_username}/crop-disease-efficientnet-b4")
+            print(f"   → Target: {MODEL_PATH}")
             try:
-                from huggingface_hub import snapshot_download
+                from huggingface_hub import hf_hub_download
                 MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-                CLASS_NAMES_PATH.parent.mkdir(parents=True, exist_ok=True)
-                local = snapshot_download(
+                downloaded = hf_hub_download(
                     repo_id=f"{hf_username}/crop-disease-efficientnet-b4",
                     repo_type="model",
+                    filename="efficientnet_b4_best.pt",
                     token=hf_token,
                     local_dir=str(MODEL_PATH.parent),
                 )
-                # Move class_names.json if needed
-                json_src = MODEL_PATH.parent / "class_names.json"
-                if json_src.exists() and not CLASS_NAMES_PATH.exists():
-                    CLASS_NAMES_PATH.parent.mkdir(parents=True, exist_ok=True)
-                    import shutil
-                    shutil.copy(json_src, CLASS_NAMES_PATH)
-                print("  ✓  Model downloaded.")
+                print(f"  ✓  Model downloaded → {downloaded}")
             except Exception as e:
-                print(f"  ⚠  Could not download model: {e}. Using random weights.")
+                print(f"  ⚠  Could not download model: {e}")
+                print("     Using random weights (predictions will be incorrect).")
         else:
             print("  ⚠  MODEL_PATH not found and HF_USERNAME not set. Using random weights.")
+
 
     VISION_MODEL = EfficientNetB4Classifier(num_classes=len(CLASS_NAMES)).to(DEVICE)
     if MODEL_PATH.exists():

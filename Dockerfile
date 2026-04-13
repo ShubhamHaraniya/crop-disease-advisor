@@ -12,30 +12,35 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # ── Python dependencies (CPU-only, no LLM) ────────────────────────────────────
-COPY requirements_hf.txt .
-RUN pip install --no-cache-dir -r requirements_hf.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# ── Build Vite frontend (Dependencies) ─────────────────────────────────────────
+# ── Build Vite frontend (install deps first for layer caching) ─────────────────
 COPY frontend/package*.json ./frontend/
 RUN cd frontend && npm ci --silent
 
 # ── Copy application code ──────────────────────────────────────────────────────
 COPY . .
 
-# ── Build Vite frontend (Production Build) ─────────────────────────────────────
+# ── Build Vite frontend (production bundle) ────────────────────────────────────
 RUN cd frontend && npm run build
-# Output: frontend/dist/
+# Output: frontend/dist/ — served as static files by FastAPI
 
-# ── Environment: CPU-only Phase 1 (DISEASE_DB treatment plans, no LLM) ────────
+# ── Environment ───────────────────────────────────────────────────────────────
 ENV PHASE=1
 ENV PYTHONUNBUFFERED=1
+# PORT is injected at runtime by the platform:
+#   Render        → PORT=10000
+#   Cloud Run     → PORT=8080
+#   Local         → defaults to 8000 (set in app.py)
 
-# ── Non-root user ──────────────────────────────────────────────────────────────
+# ── Non-root user (security best practice) ────────────────────────────────────
 RUN useradd -m -u 1000 appuser && chown -R appuser /app
 USER appuser
 
-# ── Expose port ────────────────────────────────────────────────────────────────
-EXPOSE 7860
+# ── Expose default port (informational only — runtime PORT env overrides this) ─
+EXPOSE 8080
 
-# ── Launch Application ────────────────────────────────────────────────────────
+# ── Start — reads PORT from environment ───────────────────────────────────────
 CMD ["python", "app.py"]
+

@@ -19,9 +19,9 @@
 
 ## 📌 Overview
 
-**Crop Disease Advisor** is an end-to-end MLOps project that combines computer vision and large language models to help Indian farmers identify plant diseases from leaf photographs and receive detailed, contextual treatment plans — all in a single, production-deployed web application.
+**Crop Disease Advisor** is a full end-to-end MLOps project combining computer vision and large language models to help Indian farmers identify plant diseases from leaf photographs and receive structured, region-aware treatment plans.
 
-Upload a photo of a diseased leaf → get an **instant diagnosis** across 38 disease classes → receive a **structured treatment plan** with organic treatments, chemical treatments, preventive measures, yield impact, and region/season-aware advisory.
+Upload a photo → **instant diagnosis** across 38 disease classes → **structured treatment plan** with organic/chemical treatments, yield impact, and region/season advisory.
 
 ---
 
@@ -32,277 +32,366 @@ Upload a photo of a diseased leaf → get an **instant diagnosis** across 38 dis
 | 🚀 **Production App (Render)** | https://crop-disease-advisor.onrender.com/ |
 | 🤗 **HuggingFace Space** | https://huggingface.co/spaces/spidey1807/crop-disease-advisor |
 | 🧠 **EfficientNet-B4 Model** | https://huggingface.co/spidey1807/crop-disease-efficientnet-b4 |
-| 🦙 **Qwen2.5-3B QLoRA Model** | https://huggingface.co/spidey1807/crop-disease-qwen2.5-qlora |
+| 🦙 **Qwen2.5-3B QLoRA Adapter** | https://huggingface.co/spidey1807/crop-disease-qwen2.5-qlora |
 | 📊 **W&B Vision Training** | https://wandb.ai/spharaniya18-intelkit-solutions/crop-disease-advisor |
 | 📊 **W&B LLM Training** | https://wandb.ai/spharaniya18-intelkit-solutions/crop-disease-advisor-llm |
 
 ---
 
-## ✨ Key Features
+## 📊 Results
 
-| Feature | Details |
-|---|---|
-| 🖼️ **Drag-and-drop image upload** | Instant preview with file validation |
-| 🦠 **38 disease classes, 14 crops** | EfficientNet-B4 fine-tuned on PlantVillage |
-| 🎚️ **Dual severity mode** | Auto-detection or manual slider (Mild / Moderate / Severe) |
-| 💊 **Tabbed treatment plans** | Organic · Chemical · Preventive · Advisory |
-| 🌍 **Region & Season aware** | Tailored for 5 Indian regions × 3 crop seasons (Kharif/Rabi/Zaid) |
-| 📄 **Professional PDF report** | One-click clinical report download |
-| ⚡ **CPU-only deployment** | No GPU needed — works on Render free tier |
-
----
-
-## 🏗️ System Architecture
-
-```
-                        ┌─────────────────────────────┐
-                        │       User (Browser)         │
-                        │    Vite + Vanilla JS UI      │
-                        └────────────┬────────────────┘
-                                     │ REST API
-                        ┌────────────▼────────────────┐
-                        │     FastAPI Backend          │
-                        │       (app.py)               │
-                        └──────┬─────────────┬────────┘
-                               │             │
-               ┌───────────────▼──┐   ┌─────▼──────────────────┐
-               │  Vision Pipeline  │   │   Treatment Pipeline    │
-               │                   │   │                         │
-               │  EfficientNet-B4  │   │   DISEASE_DB Fallback   │
-               │  (38 classes)     │   │   (curated knowledge)   │
-               │  timm + PyTorch   │   │   ── OR ──              │
-               └───────────────────┘   │   Qwen2.5-3B + QLoRA   │
-                                       │   (fine-tuned LLM)      │
-                                       └─────────────────────────┘
-```
-
-**Phase 1 (Production/CPU):** Vision model → DISEASE\_DB curated treatment plans
-**Phase 2 (GPU/Chatbot):** Vision model → Qwen2.5-3B QLoRA fine-tuned LLM advisory
+| Model | Metric | Score |
+|---|---|---|
+| EfficientNet-B4 | Test Accuracy | **99.69%** |
+| EfficientNet-B4 | F1 Macro | **99.58%** |
+| EfficientNet-B4 | AUC (OvR) | **100.0%** |
+| Qwen2.5-3B QLoRA | JSON Validity | **100%** |
+| Qwen2.5-3B QLoRA | Schema Compliance | **100%** |
+| Qwen2.5-3B QLoRA | BERTScore F1 | **81.68%** |
+| Qwen2.5-3B QLoRA | Perplexity | **1.42** |
 
 ---
 
-## 📂 Repository Structure
+## 🏗️ Architecture
+
+```
+User (Browser)  →  Vite Frontend (HTML/JS/CSS)
+                          │ REST API
+                          ▼
+              FastAPI Backend  [app.py → src/api/main_phase2.py]
+                 │                          │
+    ┌────────────▼──────────┐   ┌───────────▼──────────────────┐
+    │    Vision Pipeline    │   │    Treatment Pipeline        │
+    │  src/vision/model.py  │   │  PHASE=1 → DISEASE_DB        │
+    │  EfficientNet-B4      │   │  (src/llm/generate_dataset)  │
+    │  38 disease classes   │   │  PHASE=2 → Qwen2.5-3B QLoRA  │
+    └───────────────────────┘   │  (src/llm/advisor.py)        │
+                                └──────────────────────────────┘
+```
+
+---
+
+## 📁 Complete Repository Structure
 
 ```
 crop-disease-advisor/
 │
-├── app.py                          # FastAPI entrypoint (reads PORT env)
+├── app.py                              # Uvicorn entrypoint — loads .env, reads PORT
 ├── app/
-│   └── chatbot.py                  # Streamlit LLM chatbot (presentation)
+│   └── chatbot.py                      # Streamlit LLM chatbot (GPU presentation)
 │
-├── src/
-│   ├── api/main_phase2.py          # FastAPI routes & model loading
+├── src/                                # Core library — imported by scripts and API
+│   ├── api/
+│   │   └── main_phase2.py              # FastAPI routes: /predict /health /classes
 │   ├── vision/
-│   │   ├── model.py                # EfficientNet-B4 classifier
-│   │   └── preprocess.py           # Image transforms
-│   └── llm/
-│       ├── advisor.py              # LLM inference + DISEASE_DB fallback
-│       └── generate_dataset.py     # Curated treatment knowledge base
+│   │   ├── model.py                    # EfficientNetB4Classifier class definition
+│   │   └── preprocess.py              # TRAIN_TRANSFORM, VAL_TRANSFORM pipelines
+│   ├── llm/
+│   │   ├── advisor.py                  # CropDiseaseAdvisor: LLM inference + DISEASE_DB fallback
+│   │   ├── generate_dataset.py         # DISEASE_DB knowledge base + dataset generator
+│   │   └── evaluate_llm.py            # Two-mode LLM evaluation (JSON + text metrics)
+│   └── data/
+│       ├── download_plantvillage.py    # Dataset downloader — 4 fallback methods
+│       └── convert_parquet.py         # HuggingFace Parquet → ImageFolder converter
 │
-├── scripts/
+├── scripts/                            # CLI runners — call src/ library code
 │   ├── training/
-│   │   ├── train_vision.py         # Vision model training (W&B, gradual unfreezing)
-│   │   ├── evaluate_vision.py      # Vision model evaluation
-│   │   ├── train_qlora.py          # QLoRA fine-tuning for Qwen2.5-3B
-│   │   └── test_qlora.py           # LLM inference test
+│   │   ├── train_vision.py             # EfficientNet-B4 training loop with W&B
+│   │   ├── evaluate_vision.py          # Full test-set eval → eval/eval_results.json
+│   │   ├── train_qlora.py              # Qwen2.5 QLoRA fine-tuning with SFTTrainer
+│   │   └── test_qlora.py              # Quick LLM adapter smoke test (10 prompts)
 │   ├── data/
-│   │   └── download_plantvillage.py
+│   │   ├── download_plantvillage.py    # CLI wrapper for dataset download
+│   │   └── convert_parquet.py         # CLI wrapper for parquet conversion
 │   └── ops/
-│       └── upload_models.py
+│       ├── upload_models.py            # Upload vision + LLM models to HuggingFace Hub
+│       └── register_model.py          # W&B + HF registration with accuracy gate
+│
+├── tests/                              # pytest test suite (no GPU / checkpoint needed)
+│   ├── conftest.py                     # Shared fixtures: leaf image, model, tensors
+│   ├── test_api.py                     # FastAPI endpoint tests (mocked model)
+│   ├── test_vision_model.py           # Model forward pass, shape, NaN/Inf checks
+│   ├── test_llm_advisor.py            # Advisor schema validation, retry, fallback
+│   └── test_preprocessing.py          # Transform shape, dtype, normalization range
 │
 ├── configs/
-│   ├── vision_config.yaml          # Training hyperparameters
-│   └── llm_config.yaml             # QLoRA config
+│   └── vision_config.yaml             # EfficientNet-B4 hyperparameters
 │
 ├── eval/
-│   ├── eval_results.json           # Vision model test metrics
-│   └── llm_eval_run.log            # LLM evaluation results
+│   ├── eval_results.json              # Vision: 99.69% acc, 99.58% F1, AUC 1.0
+│   └── llm_eval_run.log               # LLM: 100% JSON validity, 81.68% BERTScore
 │
 ├── models/
-│   └── vision/efficientnet_b4_best.pt  # Trained model weights (~68 MB)
+│   ├── vision/
+│   │   └── efficientnet_b4_best.pt    # Trained checkpoint (~68 MB)
+│   └── llm/
+│       └── qwen2.5_3b_qlora_adapter/  # QLoRA adapter weights (safetensors + tokenizer)
 │
-├── data/processed/class_names.json # 38 disease class labels
-├── frontend/                       # Vite UI (HTML + JS + CSS)
+├── data/
+│   └── processed/
+│       └── class_names.json           # 38 disease class index → label mapping
 │
-├── requirements.txt                # Deployment (CPU-only)
-├── requirements_training.txt       # Training + chatbot (GPU)
-├── Dockerfile                      # Multi-platform Docker build
-└── .dockerignore
+├── frontend/                          # Vite SPA
+│   ├── index.html                     # App shell
+│   ├── app.js                         # UI logic: upload, predict, results
+│   ├── style.css                      # Glassmorphic dark theme
+│   ├── vite.config.js                 # Vite build config
+│   └── dist/                          # Pre-built production bundle
+│
+├── report/
+│   └── project_report.html           # Full MLOps project report (open → Print → PDF)
+│
+├── requirements.txt                   # CPU-only deployment deps (Render / Docker)
+├── requirements_training.txt          # Full GPU deps (training + chatbot)
+├── Dockerfile                         # Multi-stage build: Python + Node + Vite
+├── .dockerignore                      # Excludes node_modules, data/raw, tests, scripts
+├── .env                               # Local env vars (not committed)
+└── .env.example                       # Template: PHASE, HF_TOKEN, WANDB_API_KEY
 ```
 
 ---
 
-## 📊 Model Evaluation Results
+## 🚀 Run the App
 
-### 🔬 Vision Model — EfficientNet-B4
-
-> Evaluated on **5,431 held-out test samples** across **38 disease classes**
-
-| Metric | Score |
-|---|---|
-| **Accuracy** | **99.69%** |
-| **F1 Score (Macro)** | **99.58%** |
-| **F1 Score (Weighted)** | **99.69%** |
-| **AUC (Macro OvR)** | **100.00%** |
-| Test Samples | 5,431 |
-| Classes | 38 |
-
-**Per-class highlights** (lowest performers — all others are 100%):
-
-| Class | Accuracy |
-|---|---|
-| Corn — Cercospora (Gray leaf spot) | 96.08% |
-| Tomato — Yellow Leaf Curl Virus | 96.43% |
-| Corn — healthy | 97.98% |
-| Corn — Common rust | 98.32% |
-| Tomato — Target Spot | 98.81% |
-
----
-
-### 🤖 LLM Advisor — Qwen2.5-3B + QLoRA
-
-> Evaluated on 10 agricultural advisory prompts across diverse disease/crop/region combinations
-
-#### Eval 1: JSON Structured Output Quality
-
-| Metric | Score |
-|---|---|
-| **JSON Validity Rate** | **100%** |
-| **Schema Compliance** | **100%** |
-| **Field Completeness** | **95%** |
-| **Perplexity** (avg, lower = better) | **1.42** |
-| Avg Inference Latency | 30.0s (GPU) |
-
-#### Eval 2: Advisory Text Quality
-
-| Metric | Score |
-|---|---|
-| **BERTScore F1** | **81.68%** |
-| Semantic Similarity | 44.21% |
-| ROUGE-L | 9.23% |
-| BLEU-4 | 0.89% |
-
-> **Note:** Low BLEU/ROUGE scores are expected — the model generates contextual, structured advisory narratives that don't match reference sentences word-for-word. The high BERTScore (81.68%) reflects strong semantic alignment with reference answers.
-
----
-
-## 🏋️ Training Details
-
-### Vision Model
-
-| Setting | Value |
-|---|---|
-| Architecture | EfficientNet-B4 (timm) |
-| Dataset | PlantVillage (38 classes, 14 crops) |
-| Strategy | Gradual unfreezing (3 phases) |
-| Optimizer | AdamW + CosineAnnealingWarmRestarts |
-| Mixed Precision | FP16 (AMP) |
-| Label Smoothing | 0.1 |
-| Experiment Tracking | Weights & Biases |
-
-📊 **Training Dashboard:** [W&B Vision](https://wandb.ai/spharaniya18-intelkit-solutions/crop-disease-advisor/workspace?nw=nwuserspharaniya18)
-
-### LLM Fine-tuning
-
-| Setting | Value |
-|---|---|
-| Base Model | Qwen/Qwen2.5-3B-Instruct |
-| Method | QLoRA (4-bit NF4 quantization) |
-| LoRA Rank | 16 |
-| LoRA Alpha | 32 |
-| Trainer | TRL SFTTrainer |
-| Task | Instruction-following (structured JSON advisory) |
-| Dataset | Curated crop disease instruction dataset |
-| Experiment Tracking | Weights & Biases |
-
-📊 **Training Dashboard:** [W&B LLM](https://wandb.ai/spharaniya18-intelkit-solutions/crop-disease-advisor-llm/workspace?nw=nwuserspharaniya18)
-
----
-
-## 🚀 Quick Start
-
-### Run the API Locally
-
+### Local (CPU)
 ```bash
-# Clone the repo
 git clone https://github.com/ShubhamHaraniya/crop-disease-advisor.git
 cd crop-disease-advisor
 
-# Install CPU dependencies
 pip install -r requirements.txt
-
-# Set environment
-set PHASE=1   # Windows
-# export PHASE=1  # Linux/Mac
-
-# Start API
-python app.py
-# → http://localhost:8000
+# Windows:
+set PHASE=1 && python app.py
+# Linux/Mac:
+PHASE=1 python app.py
+# → API: http://localhost:8000
 ```
 
-### Run the Frontend (dev)
-
+### Frontend Dev Server
 ```bash
 cd frontend
 npm install
-npm run dev
-# → http://localhost:5173
+npm run dev       # → http://localhost:5173
 ```
 
-### Run with Docker
-
+### Docker
 ```bash
 docker build -t crop-disease-advisor .
 docker run -p 8080:8080 -e PHASE=1 crop-disease-advisor
 ```
 
----
-
-## 🤖 Run the LLM Chatbot (GPU required)
-
+### LLM Chatbot (GPU required)
 ```bash
-# Install GPU training dependencies
 pip install -r requirements_training.txt
-
-# Run chatbot
 streamlit run app/chatbot.py
 ```
 
 ---
 
-## 🔁 Retrain the Models
+## 📋 Script Reference — Every File Explained
 
-### Retrain Vision Model
+### 🔵 Core Library (`src/`)
 
+| File | What it does |
+|---|---|
+| `src/api/main_phase2.py` | FastAPI app. Loads EfficientNet-B4 at startup via lifespan event. Handles `POST /predict` (image → disease + treatment), `GET /health`, `GET /classes`. Serves `frontend/dist/` as static files. Switches between DISEASE_DB (PHASE=1) and LLM advisor (PHASE=2) at runtime. |
+| `src/vision/model.py` | Defines `EfficientNetB4Classifier`: EfficientNet-B4 backbone (timm) + custom 2-layer MLP head (1792→512→38). Exposes `forward_features()` for spatial feature maps and `get_target_layer()` for hook-based visualization. |
+| `src/vision/preprocess.py` | Defines `TRAIN_TRANSFORM` (RandomResizedCrop, HFlip, VFlip, Rotation, ColorJitter, Normalize) and `VAL_TRANSFORM` (Resize 256 → CenterCrop 224 → Normalize). Uses ImageNet mean/std. |
+| `src/llm/advisor.py` | `CropDiseaseAdvisor` class: loads Qwen2.5-3B + QLoRA adapter (4-bit NF4), formats LLaMA-3 chat prompts, generates structured JSON treatment plans, retries with lower temperature on parse failure, falls back to `DISEASE_DB` if both attempts fail. |
+| `src/llm/generate_dataset.py` | Two roles: (1) **Runtime** — `DISEASE_DB` dict with expert-curated organic/chemical/preventive treatments for all 38 diseases, used as production fallback; (2) **Training** — generates instruction-tuning dataset by cross-producting diseases × regions × seasons × farmer profiles. |
+| `src/llm/evaluate_llm.py` | Full LLM evaluation suite. **Eval 1 (JSON mode):** JSON validity, schema compliance (6 required keys), field completeness, perplexity. **Eval 2 (Text mode):** BLEU-4, ROUGE-L, BERTScore F1 (RoBERTa-large), semantic similarity (MiniLM). Saves to `outputs/llm_eval_results.json`. |
+| `src/data/download_plantvillage.py` | Downloads PlantVillage dataset with 4 automatic fallback methods: (1) HuggingFace `datasets` library, (2) HF `snapshot_download`, (3) Kaggle API, (4) direct `wget`. Verifies downloaded class count and image count. |
+| `src/data/convert_parquet.py` | Converts manually-downloaded HuggingFace Parquet files to PyTorch `ImageFolder` directory structure. Auto-detects image and label columns. Handles both binary bytes and dict-format image data. |
+
+---
+
+### 🟢 Training Scripts (`scripts/training/`)
+
+| File | What it does |
+|---|---|
+| `scripts/training/train_vision.py` | **Full EfficientNet-B4 training pipeline.** Reads `configs/vision_config.yaml`. Implements 3-phase gradual unfreezing (head → last 2 MBConv → full model). Uses AMP (FP16), CosineAnnealingWarmRestarts, label smoothing, early stopping. Logs every epoch to W&B. Saves best val_acc checkpoint to `models/vision/efficientnet_b4_best.pt`. |
+| `scripts/training/evaluate_vision.py` | **Test-set evaluation.** Loads the best checkpoint, runs inference on the hold-out test split. Computes accuracy, F1 macro, F1 weighted, AUC (macro OvR), and per-class accuracy. Saves metrics to `eval/eval_results.json`. |
+| `scripts/training/train_qlora.py` | **Qwen2.5-3B QLoRA fine-tuning.** Reads `configs/llm_config.yaml`. Loads model in 4-bit NF4, applies LoRA adapters (rank=16), trains with TRL `SFTTrainer` on the instruction dataset. Includes `JSONValidityCallback` that logs JSON parse success rate to W&B every 500 steps. Saves adapter to `models/llm/qwen2.5_3b_qlora_adapter/`. |
+| `scripts/training/test_qlora.py` | **Quick adapter smoke test.** Loads base model + QLoRA adapter, runs inference on 10 standard agricultural prompts (e.g., Tomato Late Blight, Apple Scab, Potato Early Blight). Confirms adapter loads correctly and generates coherent JSON responses. Run after fine-tuning to sanity-check. |
+
+---
+
+### 🟡 Data Scripts (`scripts/data/`)
+
+| File | What it does |
+|---|---|
+| `scripts/data/download_plantvillage.py` | CLI entry point for dataset download. Calls the same logic as `src/data/download_plantvillage.py`. Use: `python scripts/data/download_plantvillage.py --method hf` |
+| `scripts/data/convert_parquet.py` | CLI entry point for Parquet conversion. Calls the same logic as `src/data/convert_parquet.py`. Use: `python scripts/data/convert_parquet.py --parquet_dir downloads/` |
+
+---
+
+### 🔴 MLOps / Ops Scripts (`scripts/ops/`)
+
+| File | What it does |
+|---|---|
+| `scripts/ops/upload_models.py` | Uploads both models to HuggingFace Hub. Creates repos automatically if not present. Uploads EfficientNet-B4 `.pt` + `class_names.json` to `spidey1807/crop-disease-efficientnet-b4`, and QLoRA adapter folder to `spidey1807/crop-disease-qwen2.5-qlora`. |
+| `scripts/ops/register_model.py` | **MLOps gating pipeline.** First checks a promotion accuracy gate (default ≥ 85% — set `--min_accuracy 0.98` for stricter gate). If passed: (1) logs model as W&B artifact with all eval metadata (accuracy, F1, AUC, epoch), tagged as `staging` or `production`; (2) uploads to HuggingFace Hub with eval metrics in commit message. |
+
+---
+
+### 🧪 Test Suite (`tests/`)
+
+The test suite is designed to run **without a GPU and without downloading any model checkpoints**. The `conftest.py` fixtures create a synthetic leaf image and an EfficientNet-B4 with random weights — tests verify architecture and logic, not accuracy.
+
+#### `tests/conftest.py` — Shared Fixtures
+Provides session-scoped pytest fixtures reused across all test files:
+- `sample_leaf_image` — synthetic 224×224 green PIL image (simulates a leaf scan)
+- `sample_tensor` — normalized `(1, 3, 224, 224)` torch tensor from the above image
+- `class_names` — loads real `data/processed/class_names.json` or falls back to dummy names
+- `vision_model` — `EfficientNetB4Classifier` with random weights, set to eval mode
+
+#### `tests/test_vision_model.py` — EfficientNet-B4 Architecture Tests
+8 tests verifying the model's output contract (no checkpoint needed):
+
+| Test | Checks |
+|---|---|
+| `test_forward_pass_shape` | Output logits are exactly `(1, 38)` |
+| `test_confidence_sum` | Softmax probabilities sum to exactly 1.0 |
+| `test_output_dtype` | Logits are `float32` |
+| `test_forward_features_shape` | Spatial feature map is 4-D `(1, C, h, w)` |
+| `test_get_target_layer` | Hook target returns a valid `nn.Module` |
+| `test_gradcam_output_shape` | GradCAM heatmap is 2-D `float32` |
+| `test_gradcam_range` | GradCAM values are in `[0.0, 1.0]` |
+| `test_no_nan_in_output` | No NaN or Inf values in logits |
+
+#### `tests/test_preprocessing.py` — Image Transform Tests
+6 tests verifying the preprocessing pipeline:
+
+| Test | Checks |
+|---|---|
+| `test_output_shape` | `VAL_TRANSFORM` produces `(3, 224, 224)` tensor |
+| `test_normalization_range` | Normalized values stay in `[-4, 4]` range |
+| `test_output_dtype` | Output tensor is `float32` |
+| `test_augmentation_determinism` | Same seed → identical augmented output |
+| `test_batch_consistency` | Different pixel inputs → different tensor outputs |
+| `test_channels_first` | Final tensor is `(C, H, W)` not `(H, W, C)` |
+
+#### `tests/test_llm_advisor.py` — LLM Advisor Logic Tests
+5 tests verifying schema validation, retry logic, and fallback (model mocked with `unittest.mock`):
+
+| Test | Checks |
+|---|---|
+| `test_output_schema` | Treatment plan dict has all 10 required keys |
+| `test_validate_output_passes` | `validate_output()` returns `True` for complete plan |
+| `test_validate_output_fails_on_missing_key` | Returns `False` when `action_urgency` is missing |
+| `test_json_retry_on_parse_error` | When LLM returns bad JSON: retries 3 times, falls back to DISEASE_DB |
+| `test_urgency_is_valid` | `action_urgency` is one of the 4 valid urgency levels |
+
+#### `tests/test_api.py` — FastAPI Endpoint Tests
+7 tests using `TestClient` with the model fully mocked (no actual inference):
+
+| Test | Checks |
+|---|---|
+| `test_health_endpoint` | `GET /health` returns 200 with `status: healthy` |
+| `test_classes_endpoint` | `GET /classes` returns a list |
+| `test_predict_valid_png` | `POST /predict` with PNG returns disease, confidence, top5 |
+| `test_predict_valid_jpeg` | `POST /predict` with JPEG returns 200 |
+| `test_predict_invalid_text_file` | `.txt` file returns 422 Unprocessable Entity |
+| `test_predict_invalid_pdf` | PDF file returns 422 |
+| `test_confidence_is_percentage` | Confidence float is in `[0, 100]` |
+
+#### Run all tests:
 ```bash
-pip install -r requirements_training.txt
-python scripts/training/train_vision.py --config configs/vision_config.yaml
-```
-
-### Retrain LLM (QLoRA)
-
-```bash
-# Generate instruction dataset first
-python src/llm/generate_dataset.py
-
-# Fine-tune
-python scripts/training/train_qlora.py --config configs/llm_config.yaml
+pip install pytest httpx
+pytest tests/ -v
 ```
 
 ---
 
-## 🌿 Supported Crops & Diseases
+## ⚙️ Configuration
+
+### `configs/vision_config.yaml`
+All EfficientNet-B4 training hyperparameters in one place:
+
+```yaml
+model: efficientnet_b4
+num_classes: 38
+image_size: 224
+batch_size: 32
+epochs: 50
+lr_phase1: 1.0e-3    # classifier head only
+lr_phase2: 5.0e-4    # + last 2 MBConv blocks
+lr_phase3: 1.0e-4    # full model
+unfreeze_schedule:
+  phase1_end: 15
+  phase2_end: 30
+early_stop_patience: 10
+checkpoint_dir: models/vision
+wandb_project: crop-disease-advisor
+```
+
+> ⚠️ **Note:** `configs/llm_config.yaml` is not committed (contains model paths and API keys). Create it from the parameters documented in `scripts/training/train_qlora.py` before running LLM training.
+
+---
+
+## 📥 Complete MLOps Workflow
+
+```
+Step 1  Download dataset
+        python src/data/download_plantvillage.py --method hf
+
+Step 2  Train vision model
+        python scripts/training/train_vision.py --config configs/vision_config.yaml
+
+Step 3  Evaluate vision model
+        python scripts/training/evaluate_vision.py --config configs/vision_config.yaml
+
+Step 4  Generate LLM instruction dataset
+        python src/llm/generate_dataset.py
+
+Step 5  Fine-tune LLM (needs GPU)
+        python scripts/training/train_qlora.py --config configs/llm_config.yaml
+
+Step 6  Test LLM adapter
+        python scripts/training/test_qlora.py
+
+Step 7  Evaluate LLM
+        python src/llm/evaluate_llm.py
+
+Step 8  Register model with accuracy gate
+        python scripts/ops/register_model.py \
+          --checkpoint models/vision/efficientnet_b4_best.pt \
+          --eval_path eval/eval_results.json \
+          --stage production --min_accuracy 0.98
+
+Step 9  Upload to HuggingFace Hub
+        python scripts/ops/upload_models.py --username spidey1807
+
+Step 10 Deploy
+        git push origin main   # triggers Render auto-deploy
+```
+
+---
+
+## ⚙️ Environment Variables
+
+| Variable | Value | Description |
+|---|---|---|
+| `PHASE` | `1` (default) | `1` = CPU + DISEASE_DB; `2` = LLM inference |
+| `PORT` | auto | Injected by Render/Cloud Run |
+| `HF_TOKEN` | your token | HuggingFace API token |
+| `WANDB_API_KEY` | your key | Weights & Biases API key |
+
+Copy `.env.example` → `.env` and fill in values for local development.
+
+---
+
+## 🌿 Supported Crops & Diseases (38 Classes)
 
 | Crop | Diseases |
 |---|---|
 | 🍎 Apple | Apple Scab, Black Rot, Cedar Apple Rust, Healthy |
 | 🫐 Blueberry | Healthy |
 | 🍒 Cherry | Powdery Mildew, Healthy |
-| 🌽 Corn (Maize) | Cercospora/Gray Leaf Spot, Common Rust, Northern Leaf Blight, Healthy |
+| 🌽 Corn | Cercospora/Gray Leaf Spot, Common Rust, Northern Leaf Blight, Healthy |
 | 🍇 Grape | Black Rot, Esca (Black Measles), Leaf Blight, Healthy |
 | 🍊 Orange | Haunglongbing (Citrus Greening) |
 | 🍑 Peach | Bacterial Spot, Healthy |
-| 🫑 Pepper (Bell) | Bacterial Spot, Healthy |
+| 🫑 Pepper | Bacterial Spot, Healthy |
 | 🥔 Potato | Early Blight, Late Blight, Healthy |
 | 🍓 Raspberry | Healthy |
 | 🫘 Soybean | Healthy |
@@ -310,23 +399,8 @@ python scripts/training/train_qlora.py --config configs/llm_config.yaml
 | 🍓 Strawberry | Leaf Scorch, Healthy |
 | 🍅 Tomato | Bacterial Spot, Early Blight, Late Blight, Leaf Mold, Septoria Leaf Spot, Spider Mites, Target Spot, Yellow Leaf Curl Virus, Mosaic Virus, Healthy |
 
----
-
-## 🌍 Region & Season Support
-
-**Indian Regions:** North India · South India · West India · East India · North-East India
-
-**Crop Seasons:** Kharif (Monsoon, Jun–Oct) · Rabi (Winter, Nov–Mar) · Zaid (Summer, Apr–Jun)
-
----
-
-## ⚙️ Environment Variables
-
-| Variable | Values | Description |
-|---|---|---|
-| `PHASE` | `1` (default) | `1` = CPU mode, DISEASE_DB fallback. `2` = GPU + LLM inference |
-| `PORT` | auto | Injected by Render/Cloud Run at runtime |
-| `HF_TOKEN` | your token | Required only for downloading gated HF models |
+**Regions:** North · South · East · West · Central India  
+**Seasons:** Kharif (Monsoon) · Rabi (Winter) · Zaid (Summer)
 
 ---
 
@@ -338,4 +412,4 @@ python scripts/training/train_qlora.py --config configs/llm_config.yaml
 
 ## 📄 License
 
-This project is licensed under the **MIT License**.
+MIT License

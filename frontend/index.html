@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crop Disease Advisor — AI-Powered Plant Health Diagnostics</title>
-  <meta name="description" content="Upload a leaf photo and get instant AI-powered disease diagnosis, severity assessment, and personalized treatment plans for your crops." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
+  <meta name="description"
+    content="Upload a leaf photo and get instant AI-powered disease diagnosis, severity assessment, and personalized treatment plans for your crops." />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
 </head>
+
 <body>
 
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -36,8 +41,10 @@
   <main id="main-content">
     <section id="hero-section" class="hero">
       <div class="hero__badge">AI-Powered Agricultural Diagnostics</div>
-      <h1 class="hero__title">Plant Disease Detection<br/><span class="hero__title--accent">&amp; Treatment Planning</span></h1>
-      <p class="hero__desc">Upload a leaf photo, configure your region and season, and receive an instant AI diagnosis with a personalised treatment plan.</p>
+      <h1 class="hero__title">Plant Disease Detection<br /><span class="hero__title--accent">&amp; Treatment
+          Planning</span></h1>
+      <p class="hero__desc">Upload a leaf photo, configure your region and season, and receive an instant AI diagnosis
+        with a personalised treatment plan.</p>
       <div class="hero__chips">
         <span class="chip">🤖 EfficientNet-B4</span>
         <span class="chip">🧠 Qwen2.5-3B QLoRA</span>
@@ -57,10 +64,11 @@
         <div id="drop-zone" class="drop-zone">
           <div id="drop-zone-content" class="drop-zone__content">
             <div class="drop-zone__icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
             <p class="drop-zone__text">Drag &amp; drop your leaf image here</p>
@@ -140,15 +148,11 @@
       <div class="loading-card card">
         <div class="loading-spinner"></div>
         <h2 class="loading-title">Analyzing Your Leaf...</h2>
-        <p class="loading-desc">Running EfficientNet-B4 vision model and Qwen2.5-3B treatment planner. This may take a moment.</p>
+        <p class="loading-desc">Running EfficientNet-B4 vision model. This may take a moment.</p>
         <div class="loading-steps">
           <div id="step-vision" class="loading-step">
             <span class="step-dot"></span>
             <span>Vision model classification</span>
-          </div>
-          <div id="step-llm" class="loading-step">
-            <span class="step-dot"></span>
-            <span>LLM treatment plan generation</span>
           </div>
           <div id="step-report" class="loading-step">
             <span class="step-dot"></span>
@@ -248,10 +252,18 @@
       <!-- ACTION: EXPORT REPORT                              -->
       <!-- ═══════════════════════════════════════════════════ -->
       <div class="report-actions" style="margin-top: 30px; text-align: center;">
-        <h2 class="section-title" style="justify-content: center; margin-bottom: 20px;"><span class="section-icon">📄</span> Clinical Diagnostic Report</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">The AI has compiled a comprehensive region-specific report with full treatment instructions.</p>
-        <button id="download-pdf-btn" class="analyze-btn" style="max-width: 300px; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <h2 class="section-title" style="justify-content: center; margin-bottom: 20px;"><span
+            class="section-icon">📄</span> Clinical Diagnostic Report</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">The AI has compiled a comprehensive
+          region-specific report with full treatment instructions.</p>
+        <button id="download-pdf-btn" class="analyze-btn"
+          style="max-width: 300px; margin: 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
           Download Full PDF Report
         </button>
       </div>
@@ -285,4 +297,5 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
   <script type="module" src="/app.js"></script>
 </body>
+
 </html>

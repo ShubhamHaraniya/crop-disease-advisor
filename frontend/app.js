@@ -42,7 +42,6 @@ const els = {
 
   // Loading steps
   stepVision: $('#step-vision'),
-  stepLlm:    $('#step-llm'),
   stepReport: $('#step-report'),
 
   // Stats
@@ -325,24 +324,20 @@ function showLoading() {
   els.resultsSection.style.display = 'none';
 
   // Reset steps
-  [els.stepVision, els.stepLlm, els.stepReport].forEach(s => {
-    s.className = 'loading-step';
+  [els.stepVision, els.stepReport].forEach(s => {
+    if (s) s.className = 'loading-step';
   });
 
   // Animate steps sequentially
-  setTimeout(() => els.stepVision.classList.add('loading-step--active'), 200);
+  setTimeout(() => { if (els.stepVision) els.stepVision.classList.add('loading-step--active'); }, 200);
   setTimeout(() => {
-    els.stepVision.classList.replace('loading-step--active', 'loading-step--done');
-    els.stepLlm.classList.add('loading-step--active');
+    if (els.stepVision) els.stepVision.classList.replace('loading-step--active', 'loading-step--done');
+    if (els.stepReport) els.stepReport.classList.add('loading-step--active');
   }, 2000);
-  setTimeout(() => {
-    els.stepLlm.classList.replace('loading-step--active', 'loading-step--done');
-    els.stepReport.classList.add('loading-step--active');
-  }, 4000);
 }
 
 function hideLoading() {
-  els.stepReport.classList.replace('loading-step--active', 'loading-step--done');
+  if (els.stepReport) els.stepReport.classList.replace('loading-step--active', 'loading-step--done');
   setTimeout(() => {
     els.loadingSection.style.display = 'none';
   }, 300);

@@ -28,15 +28,14 @@ RUN cd frontend && npm run build
 
 # ── Environment: CPU-only Phase 1 (DISEASE_DB treatment plans, no LLM) ────────
 ENV PHASE=1
-ENV PORT=7860
 ENV PYTHONUNBUFFERED=1
 
-# ── HuggingFace Spaces requires non-root user ──────────────────────────────────
-RUN useradd -m -u 1000 hfuser && chown -R hfuser /app
-USER hfuser
+# ── Non-root user ──────────────────────────────────────────────────────────────
+RUN useradd -m -u 1000 appuser && chown -R appuser /app
+USER appuser
 
-# ── Expose HF port ────────────────────────────────────────────────────────────
+# ── Expose port ────────────────────────────────────────────────────────────────
 EXPOSE 7860
 
-# ── Launch FastAPI (serves API + Vite static files) ───────────────────────────
-CMD ["python", "-m", "uvicorn", "src.api.main_phase2:app", "--host", "0.0.0.0", "--port", "7860"]
+# ── Launch Application ────────────────────────────────────────────────────────
+CMD ["python", "app.py"]

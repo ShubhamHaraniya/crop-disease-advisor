@@ -29,49 +29,49 @@ DARK = st.session_state.theme == "dark"
 # Design tokens
 # ─────────────────────────────────────────────────────────────────────────────
 if DARK:
-    BG          = "#060e09"
-    BG2         = "#0a1510"
-    BG3         = "#0d1e14"
-    SURFACE     = "#0f2218"
-    BORDER      = "#1e4a2c"
-    BORDER_GLOW = "#22c55e55"
-    TEXT        = "#d4f5e4"
-    TEXT_MUT    = "#5a8a6a"
-    TEXT_DIM    = "#2d5a3d"
-    ACCENT      = "#4ade80"
-    ACCENT2     = "#22d3ee"
+    BG          = "#050a06"
+    BG2         = "#081210"
+    BG3         = "#0b1a13"
+    SURFACE     = "#0d1f16"
+    BORDER      = "#164430"
+    BORDER_GLOW = "#34d39955"
+    TEXT        = "#e2f5ea"
+    TEXT_MUT    = "#6b9b7e"
+    TEXT_DIM    = "#2f5e42"
+    ACCENT      = "#34d399"
+    ACCENT2     = "#38bdf8"
     ACCENT3     = "#a78bfa"
-    USER_BG     = "linear-gradient(135deg,#0f2d18,#0f3520)"
-    USER_BD     = "#22c55e30"
-    BOT_BG      = "linear-gradient(135deg,#0a1420,#0a1828)"
-    BOT_BD      = "#22d3ee18"
-    SIDEBAR_BG  = "#060e09"
-    INPUT_BG    = "#0a1510"
-    INPUT_BD    = "#1e4a2c"
-    STAT_BG     = "#0f2218"
-    CODE_BG     = "#0d1e14"
+    USER_BG     = "linear-gradient(135deg,#0c2516 0%,#0e2e1e 100%)"
+    USER_BD     = "#34d39925"
+    BOT_BG      = "linear-gradient(135deg,#081218 0%,#091820 100%)"
+    BOT_BD      = "#38bdf815"
+    SIDEBAR_BG  = "#050a06"
+    INPUT_BG    = "#081210"
+    INPUT_BD    = "#164430"
+    STAT_BG     = "#0d1f16"
+    CODE_BG     = "#0b1a13"
 else:
-    BG          = "#f0faf4"
+    BG          = "#f4faf6"
     BG2         = "#ffffff"
-    BG3         = "#e8f5ee"
+    BG3         = "#eaf5ef"
     SURFACE     = "#ffffff"
-    BORDER      = "#bbddc9"
-    BORDER_GLOW = "#16a34a55"
-    TEXT        = "#1a3a26"
-    TEXT_MUT    = "#4a7c5e"
-    TEXT_DIM    = "#86b898"
-    ACCENT      = "#16a34a"
-    ACCENT2     = "#0891b2"
+    BORDER      = "#c4e0d0"
+    BORDER_GLOW = "#16a34a44"
+    TEXT        = "#15302a"
+    TEXT_MUT    = "#3d7a5c"
+    TEXT_DIM    = "#88b8a0"
+    ACCENT      = "#059669"
+    ACCENT2     = "#0284c7"
     ACCENT3     = "#7c3aed"
-    USER_BG     = "linear-gradient(135deg,#dcfce7,#d1fae5)"
-    USER_BD     = "#22c55e55"
-    BOT_BG      = "linear-gradient(135deg,#ffffff,#f8fffe)"
+    USER_BG     = "linear-gradient(135deg,#e0f9ec 0%,#d5f5e3 100%)"
+    USER_BD     = "#34d39940"
+    BOT_BG      = "linear-gradient(135deg,#ffffff 0%,#f8fdfa 100%)"
     BOT_BD      = "#bae6fd"
-    SIDEBAR_BG  = "#f0faf4"
+    SIDEBAR_BG  = "#f4faf6"
     INPUT_BG    = "#ffffff"
-    INPUT_BD    = "#bbddc9"
-    STAT_BG     = "#e8f5ee"
-    CODE_BG     = "#dcfce7"
+    INPUT_BD    = "#c4e0d0"
+    STAT_BG     = "#eaf5ef"
+    CODE_BG     = "#e0f9ec"
 # ─────────────────────────────────────────────────────────────────────────────
 # CSS injection
 # ─────────────────────────────────────────────────────────────────────────────
@@ -85,11 +85,20 @@ st.markdown(f"""
 /* ─── App shell ─── */
 .stApp {{
     background: {BG} !important;
-    {"background-image: radial-gradient(ellipse 90% 60% at 50% -10%, #0a2e1866 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 85% 85%, #0e1a3055 0%, transparent 50%) !important;" if DARK else ""}
+    {"background-image: radial-gradient(ellipse 80% 50% at 50% -5%, #0a2e1844 0%, transparent 50%), radial-gradient(ellipse 40% 35% at 90% 90%, #0e1a3033 0%, transparent 45%) !important;" if DARK else ""}
     min-height: 100vh;
 }}
 #MainMenu, footer, header {{ visibility: hidden !important; }}
 .block-container {{ padding: 0 !important; max-width: 100% !important; }}
+/* hide streamlit deploy button */
+.stDeployButton {{ display: none !important; }}
+/* kill all white background leaks */
+.stApp > div, .stApp > div > div, .main .block-container,
+[data-testid="stBottomBlockContainer"],
+[data-testid="stBottom"] > div,
+section.main > div {{
+    background: {BG} !important;
+}}
 /* ─── Sidebar ─── */
 [data-testid="stSidebar"] {{
     background: {SIDEBAR_BG} !important;
@@ -100,53 +109,60 @@ st.markdown(f"""
 }}
 /* ─── Buttons ─── */
 div[data-testid="stButton"] > button {{
-    background: {"linear-gradient(135deg,#0f2218,#0d2a1a)" if DARK else "linear-gradient(135deg,#f0faf4,#e8f5ee)"} !important;
-    border: 1px solid {BORDER}77 !important;
+    background: {"linear-gradient(135deg,#0d1f16,#0e2a1c)" if DARK else "linear-gradient(135deg,#f4faf6,#eaf5ef)"} !important;
+    border: 1px solid {BORDER}55 !important;
     color: {TEXT_MUT} !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     font-family: 'Outfit', sans-serif !important;
     font-size: 0.82rem !important;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
     text-align: left !important;
-    padding: 0.5rem 0.9rem !important;
+    padding: 0.55rem 1rem !important;
     width: 100% !important;
-    margin-bottom: 0.3rem !important;
-    transition: all 0.18s ease !important;
+    margin-bottom: 0.35rem !important;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1) !important;
     letter-spacing: 0.01em !important;
 }}
 div[data-testid="stButton"] > button:hover {{
-    background: {"linear-gradient(135deg,#14532d,#166534)" if DARK else "linear-gradient(135deg,#dcfce7,#d1fae5)"} !important;
-    border-color: {ACCENT}88 !important;
+    background: {"linear-gradient(135deg,#14532d,#166534)" if DARK else "linear-gradient(135deg,#d5f5e3,#c8f0da)"} !important;
+    border-color: {ACCENT}66 !important;
     color: {ACCENT} !important;
-    transform: translateX(3px) !important;
-    box-shadow: {"0 0 16px #22c55e18" if DARK else "0 2px 12px #22c55e22"} !important;
+    transform: translateX(4px) !important;
+    box-shadow: {"0 4px 20px #34d39912, 0 0 0 1px #34d39908" if DARK else "0 4px 16px #22c55e15"} !important;
 }}
 /* ─── Chat messages ─── */
 [data-testid="stChatMessage"] {{
     background: transparent !important;
     border: none !important;
-    padding: 0.25rem 0 !important;
+    padding: 0.4rem 0 !important;
 }}
 [data-testid="stChatMessage"] > div {{
-    border-radius: 16px !important;
-    padding: 1rem 1.3rem !important;
-    transition: box-shadow 0.2s;
+    border-radius: 18px !important;
+    padding: 1.1rem 1.4rem !important;
+    transition: all 0.25s cubic-bezier(.4,0,.2,1);
+    {"backdrop-filter: blur(12px);" if DARK else ""}
 }}
 /* user */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) > div {{
     background: {USER_BG} !important;
     border: 1px solid {USER_BD} !important;
-    border-radius: 20px 20px 6px 20px !important;
-    max-width: 80% !important;
+    border-radius: 22px 22px 4px 22px !important;
+    max-width: 78% !important;
     margin-left: auto !important;
-    box-shadow: {"0 4px 24px #22c55e0a" if DARK else "0 2px 16px #22c55e18"} !important;
+    box-shadow: {"0 8px 32px #34d39908, inset 0 1px 0 #34d39910" if DARK else "0 4px 20px #22c55e12"} !important;
+}}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) > div:hover {{
+    box-shadow: {"0 8px 40px #34d39915" if DARK else "0 6px 24px #22c55e18"} !important;
 }}
 /* assistant */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) > div {{
     background: {BOT_BG} !important;
     border: 1px solid {BOT_BD} !important;
-    border-radius: 20px 20px 20px 6px !important;
-    box-shadow: {"0 4px 24px #22d3ee08" if DARK else "0 2px 16px #0891b218"} !important;
+    border-radius: 22px 22px 22px 4px !important;
+    box-shadow: {"0 8px 32px #38bdf806, inset 0 1px 0 #38bdf808" if DARK else "0 4px 20px #0891b210"} !important;
+}}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) > div:hover {{
+    box-shadow: {"0 8px 40px #38bdf812" if DARK else "0 6px 24px #0891b215"} !important;
 }}
 /* text in messages */
 [data-testid="stChatMessage"] p,
@@ -184,34 +200,85 @@ div[data-testid="stButton"] > button:hover {{
     margin-bottom: 0.25rem !important;
 }}
 [data-testid="stChatMessage"] hr {{
-    border-color: {BORDER}44 !important;
+    border-color: {BORDER}33 !important;
+    margin: 1rem 0 !important;
+}}
+[data-testid="stChatMessage"] table {{
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: 1px solid {BORDER}33 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    margin: 0.6rem 0 !important;
+}}
+[data-testid="stChatMessage"] th {{
+    background: {SURFACE} !important;
+    color: {TEXT_DIM} !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    padding: 0.5rem 0.9rem !important;
+    border-bottom: 1px solid {BORDER}33 !important;
+}}
+[data-testid="stChatMessage"] td {{
+    padding: 0.55rem 0.9rem !important;
+    border-bottom: 1px solid {BORDER}18 !important;
+    font-size: 0.88rem !important;
+    color: {TEXT} !important;
+}}
+[data-testid="stChatMessage"] tr:last-child td {{
+    border-bottom: none !important;
+}}
+[data-testid="stChatMessage"] blockquote {{
+    border-left: 3px solid {ACCENT}66 !important;
+    background: {ACCENT}08 !important;
+    border-radius: 0 8px 8px 0 !important;
+    padding: 0.7rem 1rem !important;
     margin: 0.8rem 0 !important;
+    font-size: 0.88rem !important;
+}}
+[data-testid="stChatMessage"] blockquote p {{
+    margin: 0 !important;
 }}
 /* ─── Chat input ─── */
 .stChatInputContainer {{
-    background: {BG} !important;
-    border-top: 1px solid {BORDER}33 !important;
-    padding: 0.8rem 2rem !important;
+    background: {"linear-gradient(180deg,transparent," + BG + "cc," + BG + ")" if DARK else BG} !important;
+    border-top: 1px solid {BORDER}22 !important;
+    padding: 1rem 2rem 1.2rem !important;
     position: sticky !important;
     bottom: 0 !important;
+    {"backdrop-filter: blur(16px);" if DARK else ""}
 }}
 [data-testid="stChatInput"] > div {{
     background: {INPUT_BG} !important;
     border: 1.5px solid {INPUT_BD} !important;
-    border-radius: 20px !important;
-    transition: all 0.2s ease !important;
-    {"box-shadow: 0 0 0 0 #22c55e00 !important;" if DARK else ""}
+    border-radius: 24px !important;
+    transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
+    box-shadow: {"0 4px 24px #00000020, inset 0 1px 0 " + BORDER + "22" if DARK else "0 2px 12px #00000008"} !important;
+}}
+[data-testid="stChatInput"] > div > div {{
+    border: none !important;
+    background: transparent !important;
+}}
+[data-testid="stChatInput"] {{
+    border: none !important;
+    background: transparent !important;
+}}
+[data-testid="stChatInput"] * {{
+    border-color: {INPUT_BD} !important;
 }}
 [data-testid="stChatInput"] > div:focus-within {{
-    border-color: {ACCENT}99 !important;
-    box-shadow: 0 0 0 3px {ACCENT}18 {"," if DARK else " ,"}0 0 30px {ACCENT}12 !important;
+    border-color: {ACCENT}88 !important;
+    box-shadow: 0 0 0 3px {ACCENT}12, 0 4px 32px {ACCENT}08 !important;
 }}
 [data-testid="stChatInput"] textarea {{
     color: {TEXT} !important;
     font-family: 'Outfit', sans-serif !important;
     font-size: 0.93rem !important;
     background: transparent !important;
-    line-height: 1.5 !important;
+    line-height: 1.6 !important;
 }}
 [data-testid="stChatInput"] textarea::placeholder {{
     color: {TEXT_DIM} !important;
@@ -236,35 +303,39 @@ div[data-testid="stButton"] > button:hover {{
 ::-webkit-scrollbar-thumb {{ background: {BORDER}88; border-radius: 4px; }}
 ::-webkit-scrollbar-thumb:hover {{ background: {ACCENT}66; }}
 /* ─── Animations ─── */
-@keyframes fade-in {{ from {{ opacity:0; transform:translateY(6px); }} to {{ opacity:1; transform:translateY(0); }} }}
+@keyframes fade-in {{ from {{ opacity:0; transform:translateY(10px); }} to {{ opacity:1; transform:translateY(0); }} }}
 @keyframes pulse-glow {{
-    0%,100% {{ box-shadow: 0 0 8px {ACCENT}44; }}
-    50% {{ box-shadow: 0 0 20px {ACCENT}88; }}
+    0%,100% {{ box-shadow: 0 0 6px {ACCENT}33; }}
+    50% {{ box-shadow: 0 0 18px {ACCENT}55; }}
 }}
 @keyframes live-pulse {{
     0%,100% {{ opacity:1; transform:scale(1); }}
-    50% {{ opacity:0.4; transform:scale(0.75); }}
+    50% {{ opacity:0.3; transform:scale(0.7); }}
 }}
 @keyframes gradient-shift {{
     0% {{ background-position: 0% 50%; }}
     50% {{ background-position: 100% 50%; }}
     100% {{ background-position: 0% 50%; }}
 }}
+@keyframes shimmer {{
+    0% {{ background-position: -200% 0; }}
+    100% {{ background-position: 200% 0; }}
+}}
 [data-testid="stChatMessage"] {{
-    animation: fade-in 0.3s ease !important;
+    animation: fade-in 0.35s cubic-bezier(.4,0,.2,1) !important;
 }}
 /* ─── Custom components ─── */
 .cm-header {{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 2rem 0.8rem;
-    border-bottom: 1px solid {BORDER}33;
-    background: {BG};
+    padding: 1.1rem 2rem 0.9rem;
+    border-bottom: 1px solid {BORDER}25;
+    background: {"linear-gradient(180deg," + BG + "ee," + BG + "cc)" if DARK else BG};
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(10px);
+    {"backdrop-filter: blur(20px);" if DARK else "backdrop-filter: blur(12px);"}
 }}
 .cm-logo {{
     display: flex;
@@ -283,19 +354,22 @@ div[data-testid="stButton"] > button:hover {{
     {"box-shadow: 0 0 16px " + ACCENT + "22;" if DARK else ""}
 }}
 .cm-logo-text {{
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     font-weight: 800;
-    background: linear-gradient(90deg, {ACCENT}, {ACCENT2});
+    background: linear-gradient(135deg, {ACCENT}, {ACCENT2}, {ACCENT});
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     letter-spacing: -0.02em;
+    animation: gradient-shift 6s ease infinite;
 }}
 .cm-logo-sub {{
-    font-size: 0.68rem;
+    font-size: 0.62rem;
     color: {TEXT_DIM};
     font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.12em;
+    margin-top: 0.1rem;
 }}
 .live-pill {{
     display: flex;
@@ -351,20 +425,23 @@ div[data-testid="stButton"] > button:hover {{
     background: {BORDER}44;
 }}
 .model-box {{
-    background: {"linear-gradient(135deg,#0a1a0e,#071210)" if DARK else "linear-gradient(135deg,#f8fffe,#f0faf4)"};
-    border: 1px solid {BORDER}55;
-    border-radius: 12px;
-    padding: 1rem;
+    background: {"linear-gradient(135deg,#0a1a0e 0%,#071210 100%)" if DARK else "linear-gradient(135deg,#f8fffe 0%,#f0faf4 100%)"};
+    border: 1px solid {BORDER}44;
+    border-radius: 14px;
+    padding: 1.1rem;
     position: relative;
     overflow: hidden;
+    transition: border-color 0.3s ease;
+}}
+.model-box:hover {{
+    border-color: {ACCENT}44;
 }}
 {"" if not DARK else """.model-box::before {{
     content: '';
     position: absolute;
-    inset: -1px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #22c55e22, #22d3ee11, #a78bfa11);
-    z-index: -1;
+    top: 0; left: -100%; width: 200%; height: 100%;
+    background: linear-gradient(90deg, transparent, #34d39908, transparent);
+    animation: shimmer 4s ease infinite;
 }}"""}
 .model-name {{
     font-size: 0.85rem;
@@ -400,8 +477,8 @@ div[data-testid="stButton"] > button:hover {{
 }}
 /* ─── Main chat scroll area ─── */
 .main-chat {{
-    padding: 1rem 2rem;
-    max-width: 880px;
+    padding: 1.2rem 2rem 1rem;
+    max-width: 900px;
     margin: 0 auto;
 }}
 </style>
@@ -412,14 +489,17 @@ div[data-testid="stButton"] > button:hover {{
 
 # Used with base model (adapters OFF) — handles general conversation
 CHAT_SYSTEM = """You are CropMind, a warm and expert agricultural advisor for Indian farmers.
-Your job is to gather enough information before giving a treatment plan.
+Your job is to gather enough information and wait for the user to request a treatment plan before giving one.
 
 RULES:
-- If the farmer hasn't told you their CROP, ask for it first.
+- If the farmer hasn't told you their CROP, ask for it.
 - If the farmer hasn't described any SYMPTOMS or DISEASE, ask for that.
+- If the farmer hasn't told you their REGION, ask for it.
+- If the farmer hasn't given the SEVERITY (e.g. Mild, Moderate, Severe, or percentage), ask for it.
 - Ask only ONE question at a time — never ask multiple things at once.
-- Once you know both the crop AND the symptoms/disease, say: "Got it! Generating your treatment plan now..."
-- Keep replies SHORT (2-4 lines max) until you have crop + symptoms.
+- DO NOT generate a treatment plan until the user specifically asks for it AND you have all 4 pieces of information.
+- If they ask for a plan but information is missing, politely tell them what is missing and ask for it.
+- Keep replies SHORT (2-4 lines max).
 - Be warm, patient, and encouraging.
 
 EXAMPLES:
@@ -429,11 +509,8 @@ Assistant: "Welcome! Which crop are you growing this season? 🌱"
 User: "I grow tomatoes"
 Assistant: "Great! What symptoms are you seeing on your tomatoes? (e.g. spots, wilting, color change)"
 
-User: "there are yellow spots on my wheat leaves"
-Assistant: "Got it — yellow spots on wheat can indicate rust disease. Which state or region are you in? This helps me give better advice."
-
-User: "potatoes, leaves turning black and rotting"
-Assistant: "Got it! Generating your treatment plan now..."""
+User: "potatoes, leaves turning black and rotting, moderate severity in punjab. Please generate a report."
+Assistant: "Got it! Generating your treatment plan report now..."""
 
 # Used with fine-tuned model (adapters ON) — generates structured treatment plans
 PLAN_SYSTEM = """You are CropMind, an expert agricultural advisor. The farmer has already told you their crop and symptoms.
@@ -521,9 +598,24 @@ def context_has_symptoms(history: list) -> bool:
     pattern = re.compile(r'\b(' + '|'.join(SYMPTOM_WORDS) + r')\b')
     return bool(pattern.search(text))
 
+def context_has_region(history: list) -> bool:
+    """Check if any message mentions a region or Indian state."""
+    text = " ".join(m["content"].lower() for m in history if m["role"] == "user")
+    regions = ["india", "north", "south", "east", "west", "central", "state", "pradesh", "gujarat", "maharashtra", "punjab", "haryana", "kerala", "tamil nadu", "karnataka", "bengal", "assam", "bihar", "rajasthan", "odisha", "andhra"]
+    pattern = re.compile(r'\b(' + '|'.join(regions) + r')\b')
+    return bool(pattern.search(text))
+
+def context_has_severity(history: list) -> bool:
+    """Check if any message mentions disease severity or percentage."""
+    text = " ".join(m["content"].lower() for m in history if m["role"] == "user")
+    if "%" in text:
+        return True
+    pattern = re.compile(r'\b(mild|moderate|severe|high|low|percent|percentage)\b')
+    return bool(pattern.search(text))
+
 def ready_for_plan(history: list) -> bool:
-    """Returns True only when we have both crop AND symptoms."""
-    return context_has_crop(history) and context_has_symptoms(history)
+    """Returns True only when we have crop, symptoms, region, and severity."""
+    return context_has_crop(history) and context_has_symptoms(history) and context_has_region(history) and context_has_severity(history)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -633,16 +725,18 @@ if "photo_done"  not in st.session_state: st.session_state.photo_done  = False
 with st.sidebar:
     # logo
     st.markdown(f"""
-    <div style="text-align:center;padding:0.5rem 0 1.2rem;">
-      <div style="font-size:2.5rem;margin-bottom:0.5rem;
-        {'filter:drop-shadow(0 0 12px #4ade8088);' if DARK else ''}">🌿</div>
-      <div style="font-size:1.15rem;font-weight:800;
-        background:linear-gradient(90deg,{ACCENT},{ACCENT2});
+    <div style="text-align:center;padding:0.8rem 0 1.4rem;">
+      <div style="font-size:2.8rem;margin-bottom:0.6rem;
+        {'filter:drop-shadow(0 0 16px #34d39966);' if DARK else ''}">🌿</div>
+      <div style="font-size:1.2rem;font-weight:800;
+        background:linear-gradient(135deg,{ACCENT},{ACCENT2},{ACCENT});
+        background-size:200% 100%;
         -webkit-background-clip:text;-webkit-text-fill-color:transparent;
         background-clip:text;letter-spacing:-0.02em;">CropMind AI</div>
-      <div style="font-size:0.68rem;color:{TEXT_DIM};
-        font-family:'JetBrains Mono',monospace;margin-top:0.2rem;">
-        Fine-tuned Agricultural LLM
+      <div style="font-size:0.62rem;color:{TEXT_DIM};
+        font-family:'JetBrains Mono',monospace;margin-top:0.3rem;
+        letter-spacing:0.12em;">
+        AGRICULTURAL INTELLIGENCE
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -665,13 +759,13 @@ with st.sidebar:
     st.markdown(f'<div class="sb-label">⚙️ Model</div>', unsafe_allow_html=True)
     st.markdown(f"""
     <div class="model-box">
-      <div class="model-name">Qwen2.5-3B-Instruct</div>
-      <div class="model-adapter">+ QLoRA Crop Disease Adapter</div>
-      <div class="spec-row"><span class="spec-k">Quantization</span><span class="spec-v">4-bit NF4</span></div>
+      <div class="model-name">🧠 CropMind Engine</div>
+      <div class="model-adapter">Qwen2.5-3B + QLoRA Fine-tuned</div>
+      <div class="spec-row"><span class="spec-k">Precision</span><span class="spec-v">4-bit NF4</span></div>
       <div class="spec-row"><span class="spec-k">LoRA rank</span><span class="spec-v">r = 16</span></div>
-      <div class="spec-row"><span class="spec-k">Training pairs</span><span class="spec-v">12,000</span></div>
-      <div class="spec-row"><span class="spec-k">Diseases covered</span><span class="spec-v">38 classes</span></div>
-      <div class="spec-row"><span class="spec-k">Max tokens</span><span class="spec-v">650 / turn</span></div>
+      <div class="spec-row"><span class="spec-k">Training data</span><span class="spec-v">12K pairs</span></div>
+      <div class="spec-row"><span class="spec-k">Coverage</span><span class="spec-v">38 diseases</span></div>
+      <div class="spec-row"><span class="spec-k">Max output</span><span class="spec-v">1200 tok</span></div>
     </div>
     """, unsafe_allow_html=True)
     # ── session stats ──
@@ -751,15 +845,10 @@ with st.sidebar:
                     f"- **Disease:** {disease}\n"
                     f"- **Confidence:** {conf:.1f}%\n"
                     f"- **Severity:** {severity}\n\n"
-                    f"Please generate a complete treatment plan for this."
                 )
 
-                st.session_state.messages.append({"role": "user", "content": inject_msg})
-                st.session_state.llm_history.append({"role": "user", "content": inject_msg})
-                st.session_state.plan_mode = True   # skip the question phase
-                st.session_state.llm_history[0] = {"role": "system", "content": PLAN_SYSTEM}
+                st.session_state._inject = inject_msg
                 st.session_state.photo_done = True  # prevent re-processing on rerun
-                st.session_state.msg_count += 1
                 st.rerun()
 
             except Exception as e:
@@ -767,6 +856,7 @@ with st.sidebar:
                 st.info("Make sure `models/vision/efficientnet_b4_best.pt` and `data/processed/class_names.json` exist.")
 
 
+    st.markdown(f'<div class="sb-label">💬 Quick Topics</div>', unsafe_allow_html=True)
     quick_topics = [
         ("🍅", "Tomato yellow + brown spots"),
         ("🌾", "Wheat orange-rust on leaves"),
@@ -800,14 +890,15 @@ st.markdown(f"""
     <div class="cm-logo-icon">🌿</div>
     <div>
       <div class="cm-logo-text">CropMind AI</div>
-      <div class="cm-logo-sub">AGRICULTURAL INTELLIGENCE · QWEN 2.5 + QLORA</div>
+      <div class="cm-logo-sub">SMART CROP DIAGNOSTICS</div>
     </div>
   </div>
   <div class="cm-badges">
-    <div class="model-pill">🧠 QLoRA Fine-tuned</div>
+    <div class="model-pill">🧬 Qwen2.5 + QLoRA</div>
+    <div class="model-pill">📷 EfficientNet-B4</div>
     <div class="live-pill">
       <div class="live-dot"></div>
-      STREAMING LIVE
+      LIVE
     </div>
   </div>
 </div>
@@ -837,17 +928,81 @@ with model_area.container():
 st.markdown('<div class="main-chat">', unsafe_allow_html=True)
 # welcome
 if not st.session_state.messages:
-    with st.chat_message("assistant", avatar="🌿"):
-        st.markdown(f"""
-👋 **Namaste! I'm CropMind** — your AI-powered crop disease expert.
-I'm running on a **fine-tuned Qwen2.5-3B model** trained on Indian crop diseases.
-Every word I say is generated by your custom QLoRA adapter, not a template!
-Just tell me:
-- 🌱 **Which crop** you're growing
-- 🔍 **What symptoms** you're seeing  
-- 🗺️ Your **region** and **season** *(optional but helpful)*
-Type naturally — I understand messy descriptions, typos, and mixed Hindi-English!
-""")
+    st.markdown(f"""
+    <div style="
+      max-width:820px;margin:1.5rem auto 0.5rem;
+      background:{'linear-gradient(160deg,#081a10 0%,#0a2418 40%,#071218 100%)' if DARK else 'linear-gradient(160deg,#e8f5ee 0%,#d5f5e3 40%,#dbeafe 100%)'};
+      border:1px solid {BORDER}33;
+      border-radius:22px;
+      padding:2.2rem 2.4rem 1.8rem;
+      position:relative;overflow:hidden;
+    ">
+      <div style="position:absolute;top:-30px;right:-20px;font-size:8rem;opacity:0.06;pointer-events:none;">🌿</div>
+      <div style="position:absolute;bottom:-20px;left:-10px;font-size:6rem;opacity:0.04;pointer-events:none;">🌾</div>
+
+      <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.6rem;">
+        <div style="font-size:2rem;">👋</div>
+        <div>
+          <div style="font-size:1.5rem;font-weight:800;
+            background:linear-gradient(135deg,{ACCENT},{ACCENT2});
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            background-clip:text;">Welcome to CropMind</div>
+          <div style="font-size:0.78rem;color:{TEXT_MUT};margin-top:0.15rem;">
+            Your AI crop disease expert — trained on 38 disease classes
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:linear-gradient(90deg,transparent,{BORDER}44,transparent);margin:1rem 0;"></div>
+
+      <div style="font-size:0.68rem;font-weight:700;color:{TEXT_DIM};letter-spacing:0.12em;
+        text-transform:uppercase;margin-bottom:0.8rem;">Tell me about your situation</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-bottom:1.2rem;">
+        <div style="background:{'#0d1f1688' if DARK else '#ffffff88'};
+          border:1px solid {BORDER}33;border-radius:14px;padding:1rem;
+          {'backdrop-filter:blur(8px);' if DARK else ''}transition:border-color 0.2s;">
+          <div style="font-size:1.2rem;margin-bottom:0.3rem;">🌱</div>
+          <div style="font-size:0.82rem;font-weight:700;color:{ACCENT};margin-bottom:0.2rem;">Crop</div>
+          <div style="font-size:0.75rem;color:{TEXT_DIM};font-style:italic;">"I grow tomatoes"</div>
+        </div>
+        <div style="background:{'#0d1f1688' if DARK else '#ffffff88'};
+          border:1px solid {BORDER}33;border-radius:14px;padding:1rem;
+          {'backdrop-filter:blur(8px);' if DARK else ''}transition:border-color 0.2s;">
+          <div style="font-size:1.2rem;margin-bottom:0.3rem;">🔍</div>
+          <div style="font-size:0.82rem;font-weight:700;color:{ACCENT};margin-bottom:0.2rem;">Symptoms</div>
+          <div style="font-size:0.75rem;color:{TEXT_DIM};font-style:italic;">"leaves have brown spots"</div>
+        </div>
+        <div style="background:{'#0d1f1688' if DARK else '#ffffff88'};
+          border:1px solid {BORDER}33;border-radius:14px;padding:1rem;
+          {'backdrop-filter:blur(8px);' if DARK else ''}transition:border-color 0.2s;">
+          <div style="font-size:1.2rem;margin-bottom:0.3rem;">🗺️</div>
+          <div style="font-size:0.82rem;font-weight:700;color:{ACCENT};margin-bottom:0.2rem;">Region</div>
+          <div style="font-size:0.75rem;color:{TEXT_DIM};font-style:italic;">"I'm in Punjab"</div>
+        </div>
+        <div style="background:{'#0d1f1688' if DARK else '#ffffff88'};
+          border:1px solid {BORDER}33;border-radius:14px;padding:1rem;
+          {'backdrop-filter:blur(8px);' if DARK else ''}transition:border-color 0.2s;">
+          <div style="font-size:1.2rem;margin-bottom:0.3rem;">📊</div>
+          <div style="font-size:0.82rem;font-weight:700;color:{ACCENT};margin-bottom:0.2rem;">Severity</div>
+          <div style="font-size:0.75rem;color:{TEXT_DIM};font-style:italic;">"about 40% infected"</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+        <div style="background:{ACCENT}0d;border:1px solid {ACCENT}25;
+          border-radius:10px;padding:0.55rem 0.9rem;
+          font-size:0.75rem;color:{ACCENT};display:flex;align-items:center;gap:0.4rem;">
+          <span>📷</span> Upload a photo in the sidebar for auto-detection
+        </div>
+        <div style="background:{ACCENT2}0d;border:1px solid {ACCENT2}25;
+          border-radius:10px;padding:0.55rem 0.9rem;
+          font-size:0.75rem;color:{ACCENT2};display:flex;align-items:center;gap:0.4rem;">
+          <span>💬</span> Type naturally — Hindi-English mix OK!
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
 # render history
 for msg in st.session_state.messages:
     av = "🌿" if msg["role"] == "assistant" else "👨‍🌾"
@@ -877,15 +1032,27 @@ if user_input and model is not None:
     history = st.session_state.llm_history
 
     PLAN_TRIGGERS = [
-        "generat", "plan", "treatment", "detail", "tell me", "how to",
-        "what should", "advise", "suggest", "help me", "cure", "fix",
+        "generat", "genarat", "plan", "treatment", "detail", "tell me", "how to",
+        "what should", "advise", "suggest", "help me", "cure", "fix", "report", "treat"
     ]
-    user_explicitly_wants_plan = any(t in user_input.lower() for t in PLAN_TRIGGERS)
+    user_text_history = " ".join(m["content"].lower() for m in history if m["role"] == "user")
+    user_explicitly_wants_plan = any(t in user_text_history for t in PLAN_TRIGGERS)
+
+    # Check if user said "yes" in response to assistant asking if they want a plan
+    if not user_explicitly_wants_plan and len(history) >= 2:
+        last_user_msg = history[-1]["content"].lower()
+        last_assistant_msg = history[-2]["content"].lower() if history[-2]["role"] == "assistant" else ""
+        
+        affirmative_words = ["yes", "yeah", "sure", "ok", "okay", "please", "yep", "do it", "generate"]
+        is_affirmative = any(word in last_user_msg.split() for word in affirmative_words)
+        assistant_offered_plan = any(word in last_assistant_msg for word in ["plan", "report", "treatment", "detail", "generate"])
+        
+        if is_affirmative and assistant_offered_plan:
+            user_explicitly_wants_plan = True
 
     use_ft = (
         st.session_state.plan_mode
-        or ready_for_plan(history)
-        or (user_explicitly_wants_plan and context_has_crop(history))
+        or (user_explicitly_wants_plan and ready_for_plan(history))
     )
 
     if use_ft and not st.session_state.plan_mode:
@@ -901,7 +1068,7 @@ if user_input and model is not None:
     t0 = time.perf_counter()
     full_response = ""
 
-    mode_label = "🧠 Fine-tuned model" if use_ft else "💬 Base model"
+    mode_label = "🧠 Generating treatment report..." if use_ft else "💬 Thinking..."
     with st.chat_message("assistant", avatar="🌿"):
         st.caption(mode_label)
         box = st.empty()

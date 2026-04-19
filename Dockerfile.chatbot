@@ -1,0 +1,31 @@
+FROM python:3.10-slim
+
+# ── System dependencies ────────────────────────────────────────────────────────
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Working directory ──────────────────────────────────────────────────────────
+WORKDIR /app
+
+# ── Python dependencies (Includes GPU, Streamlit, and LLM libs) ─────────────────
+COPY requirements_training.txt .
+RUN pip install --no-cache-dir -r requirements_training.txt
+
+# ── Copy application code ──────────────────────────────────────────────────────
+COPY . .
+
+# ── Environment ───────────────────────────────────────────────────────────────
+ENV PHASE=2
+ENV PYTHONUNBUFFERED=1
+
+# ── Non-root user (security best practice) ────────────────────────────────────
+RUN useradd -m -u 1000 appuser && chown -R appuser /app
+USER appuser
+
+# ── Expose Streamlit's default port ───────────────────────────────────────────
+EXPOSE 8501
+
+# ── Start the Streamlit Chatbot ───────────────────────────────────────────────
+CMD ["streamlit", "run", "app/chatbot.py", "--server.port=8501", "--server.address=0.0.0.0"]

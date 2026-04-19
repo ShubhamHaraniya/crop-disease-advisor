@@ -1,0 +1,47 @@
+# 1. THE DEPLOYMENT: Tells K8s to run your container
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crop-chatbot-deployment
+  labels:
+    app: crop-chatbot
+spec:
+  replicas: 2 # Run 2 copies of the chatbot for high availability
+  selector:
+    matchLabels:
+      app: crop-chatbot
+  template:
+    metadata:
+      labels:
+        app: crop-chatbot
+    spec:
+      containers:
+      - name: chatbot-container
+        # Replace with your Docker Hub username once you build and push
+        image: shubhamharaniya/crop-disease-chatbot:v1 
+        ports:
+        - containerPort: 8501
+        env:
+        - name: PHASE
+          value: "2"
+        # Uncomment below if deploying to a cluster with GPU attached
+        # resources:
+        #   limits:
+        #     nvidia.com/gpu: 1
+
+---
+# 2. THE SERVICE: Opens traffic to your chatbot from the outside world
+apiVersion: v1
+kind: Service
+metadata:
+  name: crop-chatbot-service
+  labels:
+    app: crop-chatbot
+spec:
+  type: LoadBalancer # Automatically assigns an external IP for web access
+  selector:
+    app: crop-chatbot
+  ports:
+    - protocol: TCP
+      port: 80        # The public port users hit
+      targetPort: 8501 # The internal Streamlit port

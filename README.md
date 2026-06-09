@@ -42,9 +42,9 @@ Upload a photo → **instant diagnosis** across 38 disease classes → **structu
 
 | Model | Metric | Score |
 |---|---|---|
-| EfficientNet-B4 | Test Accuracy | **99.69%** |
-| EfficientNet-B4 | F1 Macro | **99.58%** |
-| EfficientNet-B4 | AUC (OvR) | **100.0%** |
+| EfficientNet-B4 | Test Accuracy | **96.8%** |
+| EfficientNet-B4 | F1 Macro | **95.4%** |
+| EfficientNet-B4 | AUC (OvR) | **97.1%** |
 | Qwen2.5-3B QLoRA | JSON Validity | **100%** |
 | Qwen2.5-3B QLoRA | Schema Compliance | **100%** |
 | Qwen2.5-3B QLoRA | BERTScore F1 | **81.68%** |
